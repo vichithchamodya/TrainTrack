@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:traintrack/firebase_options.dart';
-import 'package:traintrack/pages/authentication/signup_screen.dart';
+import 'package:traintrack/pages/authentication/authenticate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ class TrainTrack extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Train Track",
-      home: const Scaffold(body: SignupScreen()),
+      home: const Scaffold(body: Authenticate()),
     );
   }
 }

@@ -8,7 +8,8 @@ import 'package:traintrack/widgets/custom_password_field.dart';
 import 'package:traintrack/widgets/custom_text_field.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  final Function toggle;
+  const SignupScreen({super.key, required this.toggle});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -328,6 +329,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               GestureDetector(
+                onTap: () => widget.toggle(),
                 child: const Text(
                   "Sign In",
                   style: TextStyle(
