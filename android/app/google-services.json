@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002628867612",
+    "project_id": "the-train-track",
+    "storage_bucket": "the-train-track.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002628867612:android:bbc36f4f5a6284906c61d9",
+        "android_client_info": {
+          "package_name": "com.example.traintrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTlL_-GuxJ0LQ8YzTkOIv_V7jwoDQiA30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
