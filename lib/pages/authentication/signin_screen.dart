@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/services/auth.dart';
 import 'package:traintrack/widgets/animated_positioned_image.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/widgets/custom_password_field.dart';
@@ -17,12 +18,16 @@ class SigninScreen extends StatefulWidget {
 }
 
 class _SigninScreenState extends State<SigninScreen> {
+  // services
+  final AuthServices _auth = AuthServices();
+
+  //controllers
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isPasswordVisible = false;
-  final String _errorMessage = "";
+  String _errorMessage = "";
 
   @override
   void dispose() {
@@ -150,7 +155,7 @@ class _SigninScreenState extends State<SigninScreen> {
         FadeInLeft(
           duration: const Duration(milliseconds: 1200),
           child: Text(
-            "❌ $_errorMessage",
+            _errorMessage,
             style: const TextStyle(color: kRedColor, fontSize: 14),
           ),
         ),
@@ -159,7 +164,7 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
-  // social Logins
+  // social logins
   Widget _buildSocialLoginSection() {
     return Column(
       children: [
@@ -252,9 +257,59 @@ class _SigninScreenState extends State<SigninScreen> {
           buttonColor1: kMainColor,
           buttonColor2: kSubMainColor,
           buttonTextColor: kWhiteColor,
-          onPressed: () {},
+          onPressed: _handleSignIn,
         ),
       ),
+    );
+  }
+
+  // sign in logic
+  Future<void> _handleSignIn() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    _showLoadingDialog(context);
+
+    try {
+      final result = await _auth.signinWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      if (result == null) {
+        setState(() => _errorMessage = "Invalid Email or Password");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      setState(() => _errorMessage = "An error occurred. Please try again.");
+    }
+  }
+
+  // anonymous login
+  Future<void> _handleAnonymousLogin() async {
+    _showLoadingDialog(context);
+
+    try {
+      await _auth.signinAnonymously();
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      setState(() => _errorMessage = "Anonymous login failed");
+    }
+  }
+
+  // loading dialog
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: kSubMainColor)),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/services/auth.dart';
 import 'package:traintrack/widgets/animated_positioned_image.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/widgets/custom_password_field.dart';
@@ -16,7 +17,10 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  // services and controllers
+  // services
+  final AuthServices _auth = AuthServices();
+
+  //controllers
   final _formKey = GlobalKey<FormState>();
   final _userNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -173,7 +177,7 @@ class _SignupScreenState extends State<SignupScreen> {
           FadeInLeftBig(
             duration: const Duration(milliseconds: 1400),
             child: Text(
-              "❌ $_errorMessage",
+              _errorMessage,
               style: const TextStyle(
                 color: kRedColor,
                 fontSize: 14,
@@ -186,7 +190,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // form validation methods
+  // form validations
   String? _validatePassword(String? value) {
     if (value!.isEmpty) return "Please Enter Valid Password";
     if (value.length < 6) return "Password must be at least 6 characters";
@@ -302,11 +306,66 @@ class _SignupScreenState extends State<SignupScreen> {
               buttonColor1: kMainColor,
               buttonColor2: kSubMainColor,
               buttonTextColor: kWhiteColor,
-              onPressed: () => {},
+              onPressed: _handleSignup,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  // signup logic
+  Future<void> _handleSignup() async {
+    // validate the form
+    if (!_formKey.currentState!.validate()) return;
+
+    // check if terms and conditions are accepted
+    if (!_isTermsAccepted) {
+      setState(
+        () => _errorMessage =
+            "You must accept the Terms and Conditions to proceed",
+      );
+      return;
+    }
+
+    // show loading dialog
+    _showLoadingDialog(context);
+
+    try {
+      // perform signup
+      final result = await _auth.signupWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // ensure the widget is still mounted before proceeding
+      if (!mounted) return;
+
+      // close the loading dialog
+      Navigator.of(context).pop();
+
+      // handle the result
+      if (result == null) {
+        setState(() => _errorMessage = "Please enter a valid email");
+      }
+    } catch (e) {
+      // ensure the widget is still mounted before proceeding
+      if (!mounted) return;
+
+      // close the loading dialog on error
+      Navigator.of(context).pop();
+
+      // show error message
+      setState(() => _errorMessage = "An error occurred. Please try again.");
+    }
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: kSubMainColor)),
     );
   }
 
