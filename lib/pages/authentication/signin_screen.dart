@@ -289,19 +289,19 @@ class _SigninScreenState extends State<SigninScreen> {
   }
 
   // anonymous login
-  Future<void> _handleAnonymousLogin() async {
-    _showLoadingDialog(context);
+  // Future<void> _handleAnonymousLogin() async {
+  //   _showLoadingDialog(context);
 
-    try {
-      await _auth.signinAnonymously();
-      if (!mounted) return;
-      Navigator.of(context).pop();
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      setState(() => _errorMessage = "Anonymous login failed");
-    }
-  }
+  //   try {
+  //     await _auth.signinAnonymously();
+  //     if (!mounted) return;
+  //     Navigator.of(context).pop();
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     Navigator.of(context).pop();
+  //     setState(() => _errorMessage = "Anonymous login failed");
+  //   }
+  // }
 
   // loading dialog
   void _showLoadingDialog(BuildContext context) {

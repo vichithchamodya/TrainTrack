@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
-import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/services/auth.dart';
-import 'package:traintrack/widgets/animated_positioned_image.dart';
+import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/widgets/custom_button.dart';
-import 'package:traintrack/widgets/custom_password_field.dart';
 import 'package:traintrack/widgets/custom_text_field.dart';
+import 'package:traintrack/widgets/custom_password_field.dart';
+import 'package:traintrack/data/terms_and_conditions_data.dart';
+import 'package:traintrack/models/terms_and_conditions_model.dart';
+import 'package:traintrack/widgets/animated_positioned_image.dart';
 
 class SignupScreen extends StatefulWidget {
   final Function toggle;
@@ -20,7 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // services
   final AuthServices _auth = AuthServices();
 
-  //controllers
+  // controllers
   final _formKey = GlobalKey<FormState>();
   final _userNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -266,7 +268,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildTermsText() {
+    final termsData = TermsAndConditionsData().termsAndConditionsList;
     return GestureDetector(
+      onTap: () => _showTermsDialog(termsData),
       child: const Row(
         children: [
           Text(
@@ -358,6 +362,58 @@ class _SignupScreenState extends State<SignupScreen> {
       // show error message
       setState(() => _errorMessage = "An error occurred. Please try again.");
     }
+  }
+
+  // helper methods
+  void _showTermsDialog(List<TermsAndConditionsModel> termsData) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text(
+          "Terms and Conditions",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Please read our terms and conditions carefully before using our app.",
+              ),
+              const SizedBox(height: 20),
+              ...termsData.map((term) => _buildTermItem(term)),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(foregroundColor: kSubMainColor),
+            child: const Text("Close"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTermItem(TermsAndConditionsModel term) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          term.title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          term.content,
+          style: const TextStyle(color: kGreyColor, fontSize: 14),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
   }
 
   void _showLoadingDialog(BuildContext context) {
