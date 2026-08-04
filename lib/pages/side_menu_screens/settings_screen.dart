@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/providers/theme_provider.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -28,6 +30,16 @@ class Settings extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.dark_mode),
                 title: const Text("Dark theme", style: TextStyle(fontSize: 14)),
+                trailing: Switch(
+                  activeThumbColor: kMainColor,
+                  value: Provider.of<ThemeProvider>(context).isDarkMode,
+                  onChanged: (value) {
+                    Provider.of<ThemeProvider>(
+                      context,
+                      listen: false,
+                    ).toggleTheme(value);
+                  },
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
