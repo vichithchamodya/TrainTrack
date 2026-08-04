@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'package:traintrack/pages/wrapper.dart';
+import 'package:traintrack/services/auth.dart';
 import 'package:traintrack/firebase_options.dart';
-import 'package:traintrack/pages/authentication/authenticate.dart';
+import 'package:traintrack/models/user_model.dart';
+import 'package:traintrack/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +21,15 @@ class TrainTrack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Train Track",
-      home: const Scaffold(body: Authenticate()),
+    return StreamProvider<UserModel?>.value(
+      initialData: UserModel(uid: ""),
+      value: AuthServices().user,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Train Track",
+        theme: Provider.of<ThemeProvider>(context).getThemeData,
+        home: const Scaffold(body: Wrapper()),
+      ),
     );
   }
 }
