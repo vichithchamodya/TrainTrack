@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/services/auth.dart';
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/models/user_model.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/pages/side_menu_screens/settings_screen.dart';
 
@@ -13,6 +15,11 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel?>(context);
+    final username = user?.username.trim().isNotEmpty == true
+        ? user!.username
+        : 'User';
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -28,7 +35,7 @@ class SideMenu extends StatelessWidget {
           children: [
             _buildHeader(),
             _buildMenuItems(context),
-            _buildFooter(context),
+            _buildFooter(context, username),
           ],
         ),
       ),
@@ -52,7 +59,7 @@ class SideMenu extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         const Text(
-          "Odin Lab",
+          "Train Track",
           style: TextStyle(
             fontFamily: "Orbitron",
             color: kWhiteColor,
@@ -83,12 +90,12 @@ class SideMenu extends StatelessWidget {
       },
       {
         "icon": Icons.bookmark_border,
-        "text": "Wishlist",
+        "text": "Watchlist",
         "page": const Settings(),
       },
       {
         "icon": Icons.favorite_border,
-        "text": "My Courses",
+        "text": "My Trainings",
         "page": const Settings(),
       },
       {
@@ -138,9 +145,9 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+  Widget _buildFooter(BuildContext context, String username) {
     return GestureDetector(
-      onTap: () => _showDialog(context),
+      onTap: () => _showDialog(context, username),
       child: const Row(
         children: [
           Icon(Icons.logout, color: kGreyColor),
@@ -151,7 +158,7 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  void _showDialog(BuildContext context) {
+  void _showDialog(BuildContext context, String username) {
     showDialog(
       context: context,
       barrierColor: const Color(0xC5000000),
@@ -159,9 +166,9 @@ class SideMenu extends StatelessWidget {
         return AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: RichText(
-            text: const TextSpan(
+            text: TextSpan(
               children: [
-                TextSpan(
+                const TextSpan(
                   text: "Bye! ",
                   style: TextStyle(
                     fontSize: 22,
@@ -170,14 +177,14 @@ class SideMenu extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: "Vichith 👋🏻\n",
-                  style: TextStyle(
+                  text: "$username 👋🏻\n",
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
                     color: kGreyColor,
                   ),
                 ),
-                TextSpan(
+                const TextSpan(
                   text: "We wish to see you back real soon...",
                   style: TextStyle(
                     fontSize: 12,

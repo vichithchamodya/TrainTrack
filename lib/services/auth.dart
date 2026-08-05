@@ -7,7 +7,14 @@ class AuthServices {
 
   // create a user from uid
   UserModel? _userWithFirebaseUserUid(User? user) {
-    return user != null ? UserModel(uid: user.uid) : null;
+    if (user == null) return null;
+
+    final username = user.displayName?.trim();
+    final safeUsername = username != null && username.isNotEmpty
+        ? username
+        : user.email?.split('@').first ?? '';
+
+    return UserModel(uid: user.uid, username: safeUsername);
   }
 
   // create the stream for checking the auth changes in the user
@@ -27,13 +34,28 @@ class AuthServices {
   }
 
   // signup using email & password
-  Future signupWithEmailAndPassword(String email, String password) async {
+  Future signupWithEmailAndPassword(
+    String email,
+    String password, {
+    String? username,
+  }) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
       User? user = result.user;
+      final trimmedUsername = username?.trim();
+
+      if (user != null &&
+          trimmedUsername != null &&
+          trimmedUsername.isNotEmpty) {
+        await user.updateDisplayName(trimmedUsername);
+        await user.reload();
+        user = _auth.currentUser;
+      }
+
       return _userWithFirebaseUserUid(user);
     } catch (err) {
       return null;

@@ -340,6 +340,7 @@ class _SignupScreenState extends State<SignupScreen> {
       final result = await _auth.signupWithEmailAndPassword(
         _emailController.text,
         _passwordController.text,
+        username: _userNameController.text,
       );
 
       // ensure the widget is still mounted before proceeding

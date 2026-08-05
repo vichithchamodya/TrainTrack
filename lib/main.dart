@@ -13,7 +13,12 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const TrainTrack());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const TrainTrack(),
+    ),
+  );
 }
 
 class TrainTrack extends StatelessWidget {
@@ -22,7 +27,7 @@ class TrainTrack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<UserModel?>.value(
-      initialData: UserModel(uid: ""),
+      initialData: UserModel(uid: "", username: ""),
       value: AuthServices().user,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

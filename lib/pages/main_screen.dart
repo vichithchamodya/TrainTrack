@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/models/user_model.dart';
 
 // dashboard screens
 import 'package:traintrack/pages/dashboard/explore.dart';
@@ -71,12 +72,16 @@ class MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel?>(context);
+    final username = user?.username.trim().isNotEmpty == true
+        ? user!.username
+        : "User";
     String greeting = getGreeting();
 
     return AnimatedContainer(
       transform: Matrix4.translationValues(xOffset, yOffset, 0)
-        ..scale(scaleFactor)
-        ..rotateZ(rotationAngle), // apply rotation
+        ..scaleByDouble(scaleFactor, scaleFactor, scaleFactor, 1)
+        ..rotateZ(rotationAngle),
       duration: const Duration(milliseconds: 300),
 
       child: ClipRRect(
@@ -89,9 +94,9 @@ class MainScreenState extends State<MainScreen> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Hello Vichith,",
-                  style: TextStyle(
+                Text(
+                  "Hello $username,",
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: kGreyColor,
@@ -185,7 +190,7 @@ class MainScreenState extends State<MainScreen> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.bookmarks),
-                label: "Bookmarks",
+                label: "Watchlist",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.perm_data_setting_rounded),
@@ -193,7 +198,7 @@ class MainScreenState extends State<MainScreen> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite),
-                label: "My Courses",
+                label: "My Trainings",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
