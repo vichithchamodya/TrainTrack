@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:traintrack/services/auth.dart';
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/models/user_model.dart';
-import 'package:traintrack/widgets/custom_button.dart';
+import 'package:traintrack/widgets/logout_dialog.dart';
 import 'package:traintrack/pages/side_menu_screens/settings_screen.dart';
 
 class SideMenu extends StatelessWidget {
@@ -163,69 +163,7 @@ class SideMenu extends StatelessWidget {
       context: context,
       barrierColor: const Color(0xC5000000),
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: RichText(
-            text: TextSpan(
-              children: [
-                const TextSpan(
-                  text: "Bye! ",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: kGreyColor,
-                  ),
-                ),
-                TextSpan(
-                  text: "$username 👋🏻\n",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: kGreyColor,
-                  ),
-                ),
-                const TextSpan(
-                  text: "We wish to see you back real soon...",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: kGreyColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          content: const Text(
-            "Are you sure you want to logout ?",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: kRedColor,
-            ),
-          ),
-          actions: [
-            CustomButton(
-              buttonText: "CANCEL",
-              buttonColor1: kSubMainColor,
-              buttonColor2: kMainColor,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            CustomButton(
-              buttonText: "LOGOUT",
-              buttonColor1: kRedColor,
-              buttonColor2: kDarkRedColor,
-              onPressed: () async {
-                await _auth.signOut();
-                // close the dialog if widget is still mounted
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        );
+        return LogoutDialog(username: username, authServices: _auth);
       },
     );
   }

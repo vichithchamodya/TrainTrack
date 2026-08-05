@@ -14,7 +14,11 @@ class AuthServices {
         ? username
         : user.email?.split('@').first ?? '';
 
-    return UserModel(uid: user.uid, username: safeUsername);
+    return UserModel(
+      uid: user.uid,
+      username: safeUsername,
+      email: user.email ?? '',
+    );
   }
 
   // create the stream for checking the auth changes in the user
