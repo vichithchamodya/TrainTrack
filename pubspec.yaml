@@ -20,6 +20,11 @@ dependencies:
   shared_preferences: ^2.5.5
   intl: ^0.20.3
   flutter_launcher_icons: ^0.14.4
+  cloud_firestore: ^6.8.0
+  lottie: ^3.5.1
+  video_player: ^2.14.0
+  chewie: ^1.15.0
+  percent_indicator: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -30,9 +35,9 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: "adaptive_icon"
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/loo.png"
   adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: "assets/images/logo.png"
+  adaptive_icon_foreground: "assets/images/loo.png"
 
 flutter:
   uses-material-design: true
@@ -41,6 +46,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/gifs/
+    - assets/lotties/
 
   fonts:
     - family: Inter
