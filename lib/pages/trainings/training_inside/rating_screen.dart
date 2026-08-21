@@ -104,8 +104,8 @@ class _RatingPageState extends State<RatingPage> {
                 const SizedBox(height: 30),
                 CustomButton(
                   buttonText: "Submit Feedback",
-                  buttonColor1: Colors.green,
-                  buttonColor2: kGreenColor,
+                  buttonColor1: kSubMainColor,
+                  buttonColor2: kMainColor,
                   onPressed: () {
                     //dfinal feedback = _feedbackController.text.trim();
                     ScaffoldMessenger.of(context).showSnackBar(

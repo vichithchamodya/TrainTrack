@@ -60,7 +60,7 @@ class Profile extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    email.isNotEmpty ? email : '@user',
+                    email.isNotEmpty ? email : "@user",
                     style: const TextStyle(fontSize: 14, color: kGreyColor),
                   ),
                 ],
@@ -70,177 +70,181 @@ class Profile extends StatelessWidget {
 
           // scrollable content
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 10),
-                    ),
-                  ],
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-                child: Column(
-                  children: [
-                    // hanger
-                    Container(
-                      height: 6,
-                      width: 60,
-                      margin: const EdgeInsets.only(top: 8, bottom: 20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.grey.shade300,
-                      ),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // hanger
+                  Container(
+                    height: 6,
+                    width: 60,
+                    margin: const EdgeInsets.only(top: 8, bottom: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey.shade300,
                     ),
-                    const SizedBox(height: 10),
+                  ),
+                  const SizedBox(height: 10),
 
-                    // profile status cards
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ProfileStatusCard(
-                          statusIcon: Icons.school,
-                          statusValue: "25",
-                          statusTitle: "Enrolled",
-                        ),
-                        ProfileStatusCard(
-                          statusIcon: Icons.access_time,
-                          statusValue: "120 H",
-                          statusTitle: "Trained",
-                        ),
-                        ProfileStatusCard(
-                          statusIcon: Icons.star,
-                          statusValue: "12",
-                          statusTitle: "Achievements",
+                  // profile status cards
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ProfileStatusCard(
+                        statusIcon: Icons.school,
+                        statusValue: "25",
+                        statusTitle: "Enrolled",
+                      ),
+                      ProfileStatusCard(
+                        statusIcon: Icons.access_time,
+                        statusValue: "120 H",
+                        statusTitle: "Trained",
+                      ),
+                      ProfileStatusCard(
+                        statusIcon: Icons.star,
+                        statusValue: "12",
+                        statusTitle: "Achieved",
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // settings & actions section
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? kWhiteColor
+                          : kBlackColor,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                              ? Colors.grey.shade200
+                              : kShadowColor,
+                          blurRadius: 10,
+                          spreadRadius: 5,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 30),
-
-                    // settings & actions section
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? kWhiteColor
-                            : kBlackColor,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                ? Colors.grey.shade200
-                                : kShadowColor,
-                            blurRadius: 10,
-                            spreadRadius: 5,
-                            offset: const Offset(0, 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Account Settings",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: kGreyColor,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Account Settings",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: kGreyColor,
+                        ),
+                        const SizedBox(height: 15),
+                        Column(
+                          children: [
+                            _buildSettingsTile(
+                              context,
+                              title: "Edit Profile",
+                              icon: Icons.edit,
+                              onTap: () {},
                             ),
-                          ),
-                          const SizedBox(height: 15),
-                          Column(
-                            children: [
-                              _buildSettingsTile(
-                                context,
-                                title: "Edit Profile",
-                                icon: Icons.edit,
-                                onTap: () {},
-                              ),
-                              _buildSettingsTile(
-                                context,
-                                title: "Privacy Settings",
-                                icon: Icons.lock,
-                                iconColor: kGreyColor,
-                                onTap: () {},
-                              ),
-                              _buildSettingsTile(
-                                context,
-                                title: "Notifications",
-                                icon: Icons.notifications,
-                                iconColor: kOrangeColor,
-                                onTap: () {},
-                              ),
-                              _buildSettingsTile(
-                                context,
-                                title: "Payment Methods",
-                                icon: Icons.payment,
-                                iconColor: kGreenColor,
-                                onTap: () {},
-                              ),
-                              _buildSettingsTile(
-                                context,
-                                title: "Logout",
-                                icon: Icons.logout,
-                                iconColor: kRedColor,
-                                onTap: () => _showDialog(context, displayName),
-                              ),
-                            ],
-                          ),
-                        ],
+                            _buildSettingsTile(
+                              context,
+                              title: "Privacy Settings",
+                              icon: Icons.lock,
+                              iconColor: kGreyColor,
+                              onTap: () {},
+                            ),
+                            _buildSettingsTile(
+                              context,
+                              title: "Notifications",
+                              icon: Icons.notifications,
+                              iconColor: kOrangeColor,
+                              onTap: () {},
+                            ),
+                            _buildSettingsTile(
+                              context,
+                              title: "Payment Methods",
+                              icon: Icons.payment,
+                              iconColor: kGreenColor,
+                              onTap: () {},
+                            ),
+                            _buildSettingsTile(
+                              context,
+                              title: "Logout",
+                              icon: Icons.logout,
+                              iconColor: kRedColor,
+                              onTap: () => _showDialog(context, displayName),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // motivational section
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      gradient: const LinearGradient(
+                        colors: [kSubMainColor, kMainColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                     ),
-
-                    const SizedBox(height: 30),
-
-                    // motivational section
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: kSubMainColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          const Text(
-                            "“Keep up the great work! You're doing amazing!”",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontStyle: FontStyle.italic,
-                              color: kWhiteColor,
-                            ),
-                            textAlign: TextAlign.center,
+                    child: Column(
+                      children: [
+                        const Text(
+                          "“Keep up the great work! You're doing amazing!”",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: kWhiteColor,
                           ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kWhiteColor,
-                              foregroundColor: kSubMainColor,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kWhiteColor,
+                            foregroundColor: kSubMainColor,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
                             ),
-                            child: const Text("View Achievements"),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
-                        ],
-                      ),
+                          child: const Text("View Achievements"),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),

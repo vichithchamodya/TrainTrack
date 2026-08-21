@@ -23,7 +23,7 @@ class CompleteScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
             const Text(
-              "Congradulations ! 🥳",
+              "Congradulations !",
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -44,7 +44,7 @@ class CompleteScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     title: const Text(
-                      "Rate Your Experience! 😊",
+                      "Rate Your Experience!",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     content: SingleChildScrollView(
