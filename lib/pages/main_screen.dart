@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:traintrack/widgets/bitzy.dart';
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/models/user_model.dart';
 
 // dashboard screens
+import 'package:traintrack/pages/dashboard/tools.dart';
+import 'package:traintrack/pages/dashboard/profile.dart';
 import 'package:traintrack/pages/dashboard/explore.dart';
 import 'package:traintrack/pages/dashboard/watchlist.dart';
-import 'package:traintrack/pages/dashboard/tools.dart';
 import 'package:traintrack/pages/dashboard/my_trainings.dart';
-import 'package:traintrack/pages/dashboard/profile.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -148,6 +149,14 @@ class MainScreenState extends State<MainScreen> {
                 },
               ),
             ],
+          ),
+          endDrawer: Drawer(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.horizontal(left: Radius.circular(26)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: const Bitzy(),
           ),
           body: PageView(
             controller: _pageController,
