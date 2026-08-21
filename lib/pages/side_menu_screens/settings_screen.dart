@@ -68,7 +68,7 @@ class Settings extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.notifications_active_outlined),
                 title: const Text(
-                  "New course notifications",
+                  "New training notifications",
                   style: TextStyle(fontSize: 14),
                 ),
                 trailing: Switch(

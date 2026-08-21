@@ -145,11 +145,11 @@ class _ExploreState extends State<Explore> {
             ),
           ),
 
-          // section for courses for you
+          // section for trainings for you
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Courses for You", onTap: () {}),
+            child: SectionTitle(title: "Trainings for You", onTap: () {}),
           ),
           const SizedBox(height: 5),
           // SizedBox(
@@ -169,7 +169,7 @@ class _ExploreState extends State<Explore> {
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Most Popular Courses", onTap: () {}),
+            child: SectionTitle(title: "Most Popular Trainings", onTap: () {}),
           ),
           const SizedBox(height: 5),
           // SizedBox(

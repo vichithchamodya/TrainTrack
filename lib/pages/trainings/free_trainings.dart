@@ -6,10 +6,10 @@ import 'package:traintrack/models/training_model.dart';
 import 'package:traintrack/services/training_service.dart';
 import 'package:traintrack/widgets/vertical_training_card.dart';
 
-class FreeCourses extends StatelessWidget {
+class FreeTrainings extends StatelessWidget {
   final String categoryName;
 
-  const FreeCourses({super.key, required this.categoryName});
+  const FreeTrainings({super.key, required this.categoryName});
 
   @override
   Widget build(BuildContext context) {
