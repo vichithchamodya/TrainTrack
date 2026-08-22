@@ -228,7 +228,7 @@ class _SignupScreenState extends State<SignupScreen> {
             const Text(
               "Remember me for the next time",
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: kGreyColor,
               ),
@@ -276,7 +276,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Text(
             "I agree to the ",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: kGreyColor,
             ),
@@ -284,7 +284,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Text(
             "Terms and Conditions",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: kSubMainColor,
               decoration: TextDecoration.underline,

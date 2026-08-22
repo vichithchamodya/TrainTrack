@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/models/module_model.dart';
+import 'package:traintrack/models/user_model.dart';
+import 'package:traintrack/services/user_service.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/services/training_service.dart';
 import 'package:traintrack/widgets/custom_video_player.dart';
@@ -24,6 +27,34 @@ class TrainingScreen extends StatefulWidget {
 
 class _TrainingScreenState extends State<TrainingScreen> {
   int _currentPage = 0;
+  bool _progressLoaded = false;
+  final Stopwatch _studyTimer = Stopwatch()..start();
+  final UserService _userService = UserService();
+
+  Future<void> _saveProgress({
+    required int totalSteps,
+    required bool completed,
+  }) async {
+    final user = context.read<UserModel?>();
+    if (user == null || user.uid.isEmpty) return;
+    final previous = user.trainingProgress[widget.trainingId];
+    await _userService.saveProgress(
+      user.uid,
+      TrainingProgress(
+        trainingId: widget.trainingId,
+        trainingName: widget.trainingName,
+        currentStep: completed ? totalSteps : _currentPage,
+        totalSteps: totalSteps,
+        minutesSpent:
+            (previous?.minutesSpent ?? 0) +
+            (_studyTimer.elapsed.inSeconds / 60).ceil(),
+        completed: completed,
+        lastActivityAt: DateTime.now(),
+      ),
+    );
+    _studyTimer.reset();
+    _studyTimer.start();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +114,22 @@ class _TrainingScreenState extends State<TrainingScreen> {
 
             final List<ModuleModel> lessons = training.trainingModules;
             final int totalLessons = lessons.length;
+            if (lessons.isEmpty) {
+              return const Center(
+                child: Text('This training has no lessons yet.'),
+              );
+            }
+
+            if (!_progressLoaded) {
+              final progress = context
+                  .read<UserModel?>()
+                  ?.trainingProgress[widget.trainingId];
+              _currentPage = (progress?.currentStep ?? 0).clamp(
+                0,
+                totalLessons - 1,
+              );
+              _progressLoaded = true;
+            }
 
             // get the current lesson based on the page
             final currentLesson = lessons[_currentPage];
@@ -122,6 +169,10 @@ class _TrainingScreenState extends State<TrainingScreen> {
                                         setState(() {
                                           _currentPage--;
                                         });
+                                        _saveProgress(
+                                          totalSteps: totalLessons,
+                                          completed: false,
+                                        );
                                       }
                                     : null,
                               ),
@@ -166,8 +217,16 @@ class _TrainingScreenState extends State<TrainingScreen> {
                                   setState(() {
                                     _currentPage++;
                                   });
+                                  _saveProgress(
+                                    totalSteps: totalLessons,
+                                    completed: false,
+                                  );
                                 }
                               : () {
+                                  _saveProgress(
+                                    totalSteps: totalLessons,
+                                    completed: true,
+                                  );
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

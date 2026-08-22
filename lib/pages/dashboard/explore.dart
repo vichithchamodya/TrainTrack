@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/models/user_model.dart';
+import 'package:traintrack/services/user_service.dart';
 import 'package:traintrack/data/category_data.dart';
 import 'package:traintrack/models/category_model.dart';
-import 'package:traintrack/models/training_model.dart';
 import 'package:traintrack/widgets/section_title.dart';
 import 'package:traintrack/widgets/category_card.dart';
 import 'package:traintrack/pages/trainings/trainings.dart';
 import 'package:traintrack/widgets/daily_time_goal_card.dart';
-import 'package:traintrack/widgets/vertical_training_card.dart';
 import 'package:traintrack/widgets/horizontal_training_card.dart';
 import 'package:traintrack/pages/dashboard/all_categories.dart';
 
@@ -25,6 +26,37 @@ class _ExploreState extends State<Explore> {
 
   // state to toggle between horizontal and vertical view of categories
   bool isExpanded = false;
+
+  Future<void> _adjustStudyGoal(UserModel user) async {
+    final controller = TextEditingController(
+      text: user.studyGoalMinutes.toString(),
+    );
+    final goal = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Study goal'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'Minutes'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.pop(context, int.tryParse(controller.text)),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (goal != null && user.uid.isNotEmpty) {
+      await UserService().updateStudyGoal(user.uid, goal);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +76,27 @@ class _ExploreState extends State<Explore> {
         children: [
           const SizedBox(height: 25),
           // daily time goal card
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 15),
-            child: DailyTimeGoalCard(progressValue: 0.6, timeGoal: 15),
+            child: Builder(
+              builder: (context) {
+                final user = context.watch<UserModel?>();
+                final trainedMinutes =
+                    user?.trainingProgress.values.fold<int>(
+                      0,
+                      (total, item) => total + item.minutesSpent,
+                    ) ??
+                    0;
+                final goal = user?.studyGoalMinutes ?? 15;
+                return DailyTimeGoalCard(
+                  progressValue: trainedMinutes / goal,
+                  timeGoal: goal,
+                  onAdjustGoal: user == null
+                      ? null
+                      : () => _adjustStudyGoal(user),
+                );
+              },
+            ),
           ),
           const SizedBox(height: 20),
 

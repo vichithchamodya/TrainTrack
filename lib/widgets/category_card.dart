@@ -19,6 +19,7 @@ class CategoryCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: ElevatedButton(
         onPressed: categoryOnTap,
+        style: ElevatedButton.styleFrom(alignment: Alignment.centerLeft),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

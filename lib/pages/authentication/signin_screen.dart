@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/services/auth.dart';
@@ -26,7 +27,9 @@ class _SigninScreenState extends State<SigninScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // state variables
   bool _isPasswordVisible = false;
+  bool _isRememberMe = true;
   String _errorMessage = "";
 
   @override
@@ -108,6 +111,7 @@ class _SigninScreenState extends State<SigninScreen> {
           children: [
             _buildInputFields(),
             _buildErrorSection(),
+            _buildRememberMeCheckbox(),
             _buildSignInButton(),
             _buildSocialLoginSection(),
             _buildSignUpRedirect(),
@@ -151,7 +155,7 @@ class _SigninScreenState extends State<SigninScreen> {
   Widget _buildErrorSection() {
     return Column(
       children: [
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         FadeInLeft(
           duration: const Duration(milliseconds: 1200),
           child: Text(
@@ -159,21 +163,38 @@ class _SigninScreenState extends State<SigninScreen> {
             style: const TextStyle(color: kRedColor, fontSize: 14),
           ),
         ),
-        const SizedBox(height: 30),
       ],
+    );
+  }
+
+  // remember me checkbox
+  Widget _buildRememberMeCheckbox() {
+    return FadeInUp(
+      duration: const Duration(milliseconds: 600),
+      child: Row(
+        children: [
+          Checkbox(
+            value: _isRememberMe,
+            activeColor: kSubMainColor,
+            side: const BorderSide(color: kGreyColor, width: 1.5),
+            onChanged: (value) => setState(() => _isRememberMe = value!),
+          ),
+          const Text(
+            "Remember me for the next time",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: kGreyColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   // social logins
   Widget _buildSocialLoginSection() {
-    return Column(
-      children: [
-        _buildOrDivider(),
-        const SizedBox(height: 20),
-        _buildSocialButtons(),
-        const SizedBox(height: 20),
-      ],
-    );
+    return Column(children: [_buildOrDivider(), _buildSocialButtons()]);
   }
 
   Widget _buildOrDivider() {
@@ -183,7 +204,7 @@ class _SigninScreenState extends State<SigninScreen> {
         children: [
           Expanded(child: Divider(thickness: 1, indent: 10, endIndent: 10)),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5),
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 20),
             child: Text("or", style: TextStyle(color: kGreyColor)),
           ),
           Expanded(child: Divider(thickness: 1, indent: 10, endIndent: 10)),
@@ -197,12 +218,12 @@ class _SigninScreenState extends State<SigninScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         FadeInRight(
-          duration: const Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 1000),
           child: _buildSocialButton("assets/icons/google.svg", () {}),
         ),
         const SizedBox(width: 20),
         FadeInLeft(
-          duration: const Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 1000),
           child: _buildSocialButton("assets/icons/anonymous.svg", () {}),
         ),
       ],
@@ -217,31 +238,34 @@ class _SigninScreenState extends State<SigninScreen> {
   Widget _buildSignUpRedirect() {
     return FadeInUp(
       duration: const Duration(milliseconds: 1000),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            "Don't have an Account? ",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: kGreyColor,
-            ),
-          ),
-          GestureDetector(
-            onTap: () => widget.toggle(),
-            child: const Text(
-              'Sign Up',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Don't have an Account? ",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: kSubMainColor,
-                decoration: TextDecoration.underline,
-                decorationColor: kSubMainColor,
+                color: kGreyColor,
               ),
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: () => widget.toggle(),
+              child: const Text(
+                'Sign Up',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: kSubMainColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: kSubMainColor,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -267,24 +291,48 @@ class _SigninScreenState extends State<SigninScreen> {
   Future<void> _handleSignIn() async {
     if (!_formKey.currentState!.validate()) return;
 
+    FocusScope.of(context).unfocus();
+    setState(() => _errorMessage = "");
+
     _showLoadingDialog(context);
 
     try {
-      final result = await _auth.signinWithEmailAndPassword(
+      await _auth.signinWithEmailAndPassword(
         _emailController.text,
         _passwordController.text,
       );
 
       if (!mounted) return;
       Navigator.of(context).pop();
-
-      if (result == null) {
-        setState(() => _errorMessage = "Invalid Email or Password");
-      }
-    } catch (e) {
+    } on FirebaseAuthException catch (error) {
       if (!mounted) return;
       Navigator.of(context).pop();
-      setState(() => _errorMessage = "An error occurred. Please try again.");
+      setState(() => _errorMessage = _messageForAuthError(error.code));
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      setState(
+        () => _errorMessage =
+            "Unable to sign in. Check your connection and try again.",
+      );
+    }
+  }
+
+  String _messageForAuthError(String code) {
+    switch (code) {
+      case "invalid-credential":
+      case "invalid-login-credentials":
+      case "user-not-found":
+      case "wrong-password":
+        return "Invalid email or password.";
+      case "user-disabled":
+        return "This account has been disabled.";
+      case "too-many-requests":
+        return "Too many attempts. Try again later.";
+      case "network-request-failed":
+        return "Network error. Check your connection and try again.";
+      default:
+        return "Unable to sign in ($code).";
     }
   }
 

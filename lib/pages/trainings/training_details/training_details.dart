@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/models/training_model.dart';
+import 'package:traintrack/models/user_model.dart';
+import 'package:traintrack/services/user_service.dart';
 import 'package:traintrack/widgets/custom_tab_bar.dart';
 import 'package:traintrack/services/training_service.dart';
 import 'package:traintrack/widgets/training_details_status_item.dart';
@@ -16,6 +20,47 @@ class TrainingDetailPage extends StatelessWidget {
   final String trainingId;
 
   const TrainingDetailPage({super.key, required this.trainingId});
+
+  Future<void> _toggleWatchlist(BuildContext context) async {
+    final user = context.read<UserModel?>();
+    final uid = user?.uid.isNotEmpty == true
+        ? user!.uid
+        : FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null || uid.isEmpty) {
+      _showWatchlistMessage(context, 'Please sign in to save trainings.');
+      return;
+    }
+
+    try {
+      final saved = await UserService().toggleWatchlist(uid, trainingId);
+      if (context.mounted) {
+        _showWatchlistMessage(
+          context,
+          saved
+              ? 'Training saved to your watchlist.'
+              : 'Training removed from your watchlist.',
+        );
+      }
+    } on FirebaseException catch (error) {
+      if (context.mounted) {
+        _showWatchlistMessage(
+          context,
+          'Could not save training: ${error.code}.',
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _showWatchlistMessage(context, 'Could not save training. Try again.');
+      }
+    }
+  }
+
+  void _showWatchlistMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +164,14 @@ class TrainingDetailPage extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     IconButton(
-                                      icon: const Icon(
-                                        Icons.bookmark_outlined,
+                                      icon: Icon(
+                                        context
+                                                    .watch<UserModel?>()
+                                                    ?.watchlist
+                                                    .contains(trainingId) ==
+                                                true
+                                            ? Icons.bookmark
+                                            : Icons.bookmark_outline,
                                         color: kRatingColor,
                                       ),
                                       style: ButtonStyle(
@@ -129,7 +180,8 @@ class TrainingDetailPage extends StatelessWidget {
                                               const Color(0x63FFFFFF),
                                             ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () =>
+                                          _toggleWatchlist(context),
                                     ),
                                     IconButton(
                                       icon: const Icon(

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/widgets/custom_tab_bar.dart';
-import 'package:traintrack/pages/trainings/all_trainings.dart';
-import 'package:traintrack/pages/trainings/free_trainings.dart';
-import 'package:traintrack/pages/trainings/premium_trainings.dart';
+import 'package:traintrack/pages/trainings/trainings_list.dart';
 
 class Trainings extends StatelessWidget {
   final String categoryName;
@@ -20,11 +18,17 @@ class Trainings extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: CustomTabBar(
-          tabs: const ["All Courses", "Free Courses", "Premium Courses"],
+          tabs: const ["All Trainings", "Free Trainings", "Premium Trainings"],
           tabViews: [
-            AllTrainings(categoryName: categoryName),
-            FreeTrainings(categoryName: categoryName),
-            PremiumTrainings(categoryName: categoryName),
+            TrainingsList(categoryName: categoryName),
+            TrainingsList(
+              categoryName: categoryName,
+              filter: TrainingsFilter.free,
+            ),
+            TrainingsList(
+              categoryName: categoryName,
+              filter: TrainingsFilter.premium,
+            ),
           ],
           indicatorColor: kSubMainColor,
         ),

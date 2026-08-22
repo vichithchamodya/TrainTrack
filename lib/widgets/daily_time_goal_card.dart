@@ -6,11 +6,13 @@ import 'package:traintrack/constant/colors.dart';
 class DailyTimeGoalCard extends StatefulWidget {
   final double progressValue;
   final int timeGoal;
+  final VoidCallback? onAdjustGoal;
 
   const DailyTimeGoalCard({
     super.key,
     required this.progressValue,
     required this.timeGoal,
+    this.onAdjustGoal,
   });
 
   @override
@@ -77,7 +79,7 @@ class _DailyTimeGoalCardState extends State<DailyTimeGoalCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${done}m left of ${widget.timeGoal} mins",
+                      "${done}m of ${widget.timeGoal} mins",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -112,7 +114,7 @@ class _DailyTimeGoalCardState extends State<DailyTimeGoalCard> {
                                 color: kWhiteColor,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: widget.onAdjustGoal,
                             child: const Text(
                               "Adjust Goal",
                               style: TextStyle(fontSize: 12),

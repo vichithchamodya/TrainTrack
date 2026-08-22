@@ -14,7 +14,7 @@ class Wrapper extends StatelessWidget {
     //user data that the provider provides
     final user = Provider.of<UserModel?>(context);
 
-    if (user == null) {
+    if (user == null || user.uid.isEmpty) {
       return const Authenticate();
     } else {
       return Stack(children: [SideMenu(), const MainScreen()]);

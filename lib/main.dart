@@ -27,7 +27,7 @@ class TrainTrack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<UserModel?>.value(
-      initialData: UserModel(uid: "", username: ""),
+      initialData: null,
       value: AuthServices().user,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
