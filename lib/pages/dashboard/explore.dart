@@ -3,15 +3,17 @@ import 'package:provider/provider.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/models/user_model.dart';
-import 'package:traintrack/services/user_service.dart';
 import 'package:traintrack/data/category_data.dart';
+import 'package:traintrack/services/user_service.dart';
 import 'package:traintrack/models/category_model.dart';
+import 'package:traintrack/models/training_model.dart';
+import 'package:traintrack/services/training_service.dart';
 import 'package:traintrack/widgets/section_title.dart';
 import 'package:traintrack/widgets/category_card.dart';
 import 'package:traintrack/pages/trainings/trainings.dart';
 import 'package:traintrack/widgets/daily_time_goal_card.dart';
-import 'package:traintrack/widgets/horizontal_training_card.dart';
 import 'package:traintrack/pages/dashboard/all_categories.dart';
+import 'package:traintrack/widgets/horizontal_training_card.dart';
 
 class Explore extends StatefulWidget {
   const Explore({super.key});
@@ -24,6 +26,10 @@ class _ExploreState extends State<Explore> {
   // list of categories
   final categories = CategoryData().categoryList;
 
+  // shared training stream so Recently Added / Most Popular / Top Rated
+  // don't each open their own Firestore listener
+  final _trainingsStream = TrainingService().getTraining();
+
   // state to toggle between horizontal and vertical view of categories
   bool isExpanded = false;
 
@@ -34,21 +40,21 @@ class _ExploreState extends State<Explore> {
     final goal = await showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Study goal'),
+        title: const Text("Study goal"),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Minutes'),
+          decoration: const InputDecoration(labelText: "Minutes"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text("Cancel"),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.pop(context, int.tryParse(controller.text)),
-            child: const Text('Save'),
+            child: const Text("Save"),
           ),
         ],
       ),
@@ -58,18 +64,29 @@ class _ExploreState extends State<Explore> {
     }
   }
 
+  List<TrainingModel> _recentlyAdded(List<TrainingModel> trainings) {
+    final sorted = [...trainings]
+      ..sort((a, b) => b.trainingAddedDate.compareTo(a.trainingAddedDate));
+    return sorted.take(10).toList();
+  }
+
+  List<TrainingModel> _mostPopular(List<TrainingModel> trainings) {
+    final sorted = [...trainings]
+      ..sort(
+        (a, b) =>
+            b.trainingEnrolledStudents.compareTo(a.trainingEnrolledStudents),
+      );
+    return sorted.take(10).toList();
+  }
+
+  List<TrainingModel> _topRated(List<TrainingModel> trainings) {
+    final sorted = [...trainings]
+      ..sort((a, b) => b.trainingRating.compareTo(a.trainingRating));
+    return sorted.take(10).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // categorizing the courses
-    // CourseCategorizer categorizer = CourseCategorizer(recommendedCourses);
-
-    // List<CourseModel> mostPopularCourses = categorizer.getMostPopularCourses();
-    // List<CourseModel> recommendedCoursesList =
-    //     categorizer.getRecommendedCourses();
-    // List<CourseModel> recentlyAddedCourses =
-    //     categorizer.getRecentlyAddedCourses();
-    // List<CourseModel> topRatedCourses = categorizer.getTopRatedCourses();
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,94 +212,105 @@ class _ExploreState extends State<Explore> {
             ),
           ),
 
-          // section for trainings for you
           const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Trainings for You", onTap: () {}),
-          ),
-          const SizedBox(height: 5),
-          // SizedBox(
-          //   height: MediaQuery.of(context).size.height * 0.26,
-          //   child: ListView.builder(
-          //     scrollDirection: Axis.horizontal,
-          //     padding: const EdgeInsets.symmetric(horizontal: 15),
-          //     itemCount: recommendedCoursesList.length,
-          //     itemBuilder: (context, index) {
-          //       CourseModel course = recommendedCoursesList[index];
-          //       return const HorizontalCourseCard();
-          //     },
-          //   ),
-          // ),
 
-          // most popular courses
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Most Popular Trainings", onTap: () {}),
-          ),
-          const SizedBox(height: 5),
-          // SizedBox(
-          //   height: MediaQuery.of(context).size.height * 0.3,
-          //   child: ListView.builder(
-          //     scrollDirection: Axis.vertical,
-          //     physics: const NeverScrollableScrollPhysics(),
-          //     padding: const EdgeInsets.symmetric(horizontal: 15),
-          //     itemCount: mostPopularCourses.length,
-          //     itemBuilder: (context, index) {
-          //       CourseModel course = mostPopularCourses[index];
-          //       return const VerticalCourseCard();
-          //     },
-          //   ),
-          // ),
-
-          // recently added courses
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Recently Added", onTap: () {}),
-          ),
-          const SizedBox(height: 5),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.26,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return const HorizontalTrainingCard(
-                  trainingName: "trainingName",
-                  trainingAbout:
-                      "trainingAbout biuvwb ibwvb vnbiwv ubuowasbv uhqwvuw viuewhvue vnuiehv iwdboic owvciev nvuieibvue noieivi jneiv",
-                  trainingImage:
-                      "assets/images/Anime girl headphones desktop computer screen.jpg",
-                  isPremium: true,
-                  trainingRating: 5.2,
+          // shared stream powering Recently Added / Most Popular / Top Rated
+          StreamBuilder<List<TrainingModel>>(
+            stream: _trainingsStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(
+                    child: CircularProgressIndicator(color: kSubMainColor),
+                  ),
                 );
-              },
-            ),
-          ),
+              }
+              if (snapshot.hasError) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+                  child: Center(
+                    child: Text(
+                      "Unable to load trainings.",
+                      style: TextStyle(color: kGreyColor),
+                    ),
+                  ),
+                );
+              }
 
-          // top rated trainings
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SectionTitle(title: "Top Rated", onTap: () {}),
+              final trainings = snapshot.data ?? const <TrainingModel>[];
+              final recentlyAdded = _recentlyAdded(trainings);
+              final mostPopular = _mostPopular(trainings);
+              final topRated = _topRated(trainings);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // most popular trainings
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: SectionTitle(
+                      title: "Most Popular Trainings",
+                      onTap: () {},
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  _buildHorizontalTrainingList(mostPopular),
+
+                  // recently added trainings
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: SectionTitle(title: "Recently Added", onTap: () {}),
+                  ),
+                  const SizedBox(height: 5),
+                  _buildHorizontalTrainingList(recentlyAdded),
+
+                  // top rated trainings
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: SectionTitle(title: "Top Rated", onTap: () {}),
+                  ),
+                  const SizedBox(height: 5),
+                  _buildHorizontalTrainingList(topRated),
+                ],
+              );
+            },
           ),
-          const SizedBox(height: 5),
-          // SizedBox(
-          //   height: MediaQuery.of(context).size.height * 0.26,
-          //   child: ListView.builder(
-          //     scrollDirection: Axis.horizontal,
-          //     padding: const EdgeInsets.symmetric(horizontal: 15),
-          //     itemCount: topRatedTrainings.length,
-          //     itemBuilder: (context, index) {
-          //       TrainingModel training = topRatedTrainings[index];
-          //       return const HorizontalTrainingCard();
-          //     },
-          //   ),
-          // ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHorizontalTrainingList(List<TrainingModel> trainings) {
+    if (trainings.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: Text(
+          "Nothing here yet.",
+          style: TextStyle(color: kGreyColor, fontSize: 13),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.26,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        itemCount: trainings.length,
+        itemBuilder: (context, index) {
+          final training = trainings[index];
+          return HorizontalTrainingCard(
+            trainingId: training.trainingId,
+            trainingName: training.trainingName,
+            trainingAbout: training.trainingAbout,
+            trainingImage: training.trainingImage,
+            isPremium: training.isPremium,
+            trainingRating: training.trainingRating,
+          );
+        },
       ),
     );
   }

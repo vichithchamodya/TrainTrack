@@ -48,14 +48,16 @@ class Modules extends StatelessWidget {
             itemBuilder: (context, index) {
               final lesson = trainingModules[index];
               return Container(
-                height: 55,
                 margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: const Color(0x180095FF),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Row(
                     children: [
                       CircleAvatar(
