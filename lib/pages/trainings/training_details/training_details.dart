@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:traintrack/constant/colors.dart';
 import 'package:traintrack/widgets/custom_button.dart';
@@ -28,7 +30,7 @@ class TrainingDetailPage extends StatelessWidget {
         : FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null || uid.isEmpty) {
-      _showWatchlistMessage(context, 'Please sign in to save trainings.');
+      _showWatchlistMessage(context, "Please sign in to save trainings.");
       return;
     }
 
@@ -38,20 +40,20 @@ class TrainingDetailPage extends StatelessWidget {
         _showWatchlistMessage(
           context,
           saved
-              ? 'Training saved to your watchlist.'
-              : 'Training removed from your watchlist.',
+              ? "Training saved to your watchlist."
+              : "Training removed from your watchlist.",
         );
       }
     } on FirebaseException catch (error) {
       if (context.mounted) {
         _showWatchlistMessage(
           context,
-          'Could not save training: ${error.code}.',
+          "Could not save training: ${error.code}.",
         );
       }
     } catch (_) {
       if (context.mounted) {
-        _showWatchlistMessage(context, 'Could not save training. Try again.');
+        _showWatchlistMessage(context, "Could not save training. Try again.");
       }
     }
   }
@@ -60,6 +62,147 @@ class TrainingDetailPage extends StatelessWidget {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _trainingLink(TrainingModel training) {
+    return "https://traintrack.app/trainings/${training.trainingId}";
+  }
+
+  Future<void> _shareTraining(
+    BuildContext context,
+    TrainingModel training,
+  ) async {
+    final link = _trainingLink(training);
+    final text = "Check out \"${training.trainingName}\" on TrainTrack!\n$link";
+
+    await SharePlus.instance.share(ShareParams(text: text));
+  }
+
+  Future<void> _copyLink(BuildContext context, TrainingModel training) async {
+    await Clipboard.setData(ClipboardData(text: _trainingLink(training)));
+    if (context.mounted) {
+      _showWatchlistMessage(context, "Link copied to clipboard.");
+    }
+  }
+
+  void _showMoreOptions(BuildContext context, TrainingModel training) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // hanger
+                Container(
+                  height: 5,
+                  width: 48,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: kSubMainColor.withAlpha((0.1 * 255).round()),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.link, color: kSubMainColor),
+                  ),
+                  title: const Text(
+                    "Copy Link",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    "Copy a shareable link to this training",
+                    style: TextStyle(fontSize: 12, color: kGreyColor),
+                  ),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _copyLink(context, training);
+                  },
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: kRedColor.withAlpha((0.1 * 255).round()),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.flag_outlined, color: kRedColor),
+                  ),
+                  title: const Text(
+                    "Report an Issue",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    "Let us know about a problem with this training",
+                    style: TextStyle(fontSize: 12, color: kGreyColor),
+                  ),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _showReportDialog(context, training);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showReportDialog(BuildContext context, TrainingModel training) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text("Report an issue"),
+        content: TextField(
+          controller: reasonController,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: "Describe what's wrong with this training...",
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text("Cancel"),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              if (context.mounted) {
+                _showWatchlistMessage(
+                  context,
+                  "Thanks — your report has been submitted.",
+                );
+              }
+              // TODO: persist the report
+              // FirebaseFirestore.instance.collection("reports").add({
+              //   "trainingId": training.trainingId,
+              //   "reason": reasonController.text,
+              //   "reportedAt": FieldValue.serverTimestamp(),
+              // });
+            },
+            child: const Text("Submit"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -194,7 +337,8 @@ class TrainingDetailPage extends StatelessWidget {
                                               const Color(0x63FFFFFF),
                                             ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () =>
+                                          _shareTraining(context, training),
                                     ),
                                     IconButton(
                                       icon: const Icon(
@@ -207,7 +351,8 @@ class TrainingDetailPage extends StatelessWidget {
                                               const Color(0x63FFFFFF),
                                             ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () =>
+                                          _showMoreOptions(context, training),
                                     ),
                                   ],
                                 ),
