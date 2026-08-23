@@ -401,7 +401,7 @@ class TrainingDetailPage extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
-                                        "${training.trainingRating.toString()} (365 reviews)",
+                                        "${training.trainingRating.toString()} (${training.trainingReviews.length} reviews)",
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
@@ -469,6 +469,8 @@ class TrainingDetailPage extends StatelessWidget {
                                     trainingModules: training.trainingModules,
                                   ),
                                   Reviews(
+                                    trainingId: training.trainingId,
+                                    trainingName: training.trainingName,
                                     trainingReviews: training.trainingReviews,
                                   ),
                                 ],

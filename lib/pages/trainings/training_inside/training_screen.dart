@@ -178,19 +178,6 @@ class _TrainingScreenState extends State<TrainingScreen> {
                               ),
                             )
                           : const SizedBox(),
-                      // IconButton(
-                      //   icon: Icon(
-                      //     Icons.arrow_back,
-                      //     color: _currentPage > 0 ? kSubMainColor : kGreyColor,
-                      //   ),
-                      //   onPressed: _currentPage > 0
-                      //       ? () {
-                      //           setState(() {
-                      //             _currentPage--;
-                      //           });
-                      //         }
-                      //       : null,
-                      // ),
                       Expanded(
                         child: Text(
                           'Lesson ${_currentPage + 1} of $totalLessons',
@@ -230,28 +217,15 @@ class _TrainingScreenState extends State<TrainingScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CompleteScreen(),
+                                      builder: (context) => CompleteScreen(
+                                        trainingId: training.trainingId,
+                                        trainingName: training.trainingName,
+                                      ),
                                     ),
                                   );
                                 },
                         ),
                       ),
-                      // IconButton(
-                      //   icon: Icon(
-                      //     Icons.arrow_forward,
-                      //     color: _currentPage < totalLessons - 1
-                      //         ? kSubMainColor
-                      //         : kGreyColor,
-                      //   ),
-                      //   onPressed: _currentPage < totalLessons - 1
-                      //       ? () {
-                      //           setState(() {
-                      //             _currentPage++;
-                      //           });
-                      //         }
-                      //       : null,
-                      // ),
                     ],
                   ),
                 ),

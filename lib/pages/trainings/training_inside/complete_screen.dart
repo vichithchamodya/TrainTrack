@@ -7,7 +7,14 @@ import 'package:traintrack/widgets/custom_button.dart';
 import 'package:traintrack/pages/trainings/training_inside/rating_screen.dart';
 
 class CompleteScreen extends StatelessWidget {
-  const CompleteScreen({super.key});
+  final String trainingId;
+  final String trainingName;
+
+  const CompleteScreen({
+    super.key,
+    required this.trainingId,
+    required this.trainingName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +88,10 @@ class CompleteScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const RatingPage(),
+                              builder: (context) => RatingPage(
+                                trainingId: trainingId,
+                                trainingName: trainingName,
+                              ),
                             ),
                           );
                         },
@@ -139,7 +149,12 @@ class CompleteScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const RatingPage()),
+                  MaterialPageRoute(
+                    builder: (context) => RatingPage(
+                      trainingId: trainingId,
+                      trainingName: trainingName,
+                    ),
+                  ),
                 );
               },
               style: TextButton.styleFrom(foregroundColor: kOrangeColor),

@@ -5,6 +5,8 @@ import 'package:traintrack/models/module_model.dart';
 import 'package:traintrack/models/review_model.dart';
 
 class TrainingService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // reference to the firestore collection
   final CollectionReference _trainingCollection = FirebaseFirestore.instance
       .collection("trainings");
@@ -29,6 +31,7 @@ class TrainingService {
           final reviewSnapshot = await _trainingCollection
               .doc(doc.id)
               .collection("trainingReviews")
+              .orderBy("reviewDate", descending: true)
               .get();
           final reviews = reviewSnapshot.docs
               .map((reviewDoc) => ReviewModel.fromJson(reviewDoc.data()))
@@ -40,21 +43,29 @@ class TrainingService {
       );
     });
   }
-}
 
+  Future<void> addReview(String trainingId, ReviewModel review) async {
+    final trainingDoc = _trainingCollection.doc(trainingId);
+    final reviewsCollection = trainingDoc.collection("trainingReviews");
 
-/*
-class CourseService {
-  // reference to the firestore collection
-  final CollectionReference _courseCollection =
-      FirebaseFirestore.instance.collection("courses");
+    await reviewsCollection.add(review.toMap());
 
-  // method to get all the courses from the firestore collection
-  Stream<List<CourseModel>> getCourse() {
-    return _courseCollection.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) =>
-            CourseModel.fromJson(doc.data() as Map<String, dynamic>, doc.id))
-        .toList());
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(trainingDoc);
+      final data = snapshot.data() as Map<String, dynamic>? ?? {};
+
+      final currentCount = (data["trainingRatingCount"] as num?)?.toInt() ?? 0;
+      final currentAverage =
+          (data["trainingRating"] as num?)?.toDouble() ?? 0.0;
+
+      final newCount = currentCount + 1;
+      final newAverage =
+          ((currentAverage * currentCount) + review.reviewRating) / newCount;
+
+      transaction.set(trainingDoc, {
+        "trainingRating": newAverage,
+        "trainingRatingCount": newCount,
+      }, SetOptions(merge: true));
+    });
   }
 }
-*/

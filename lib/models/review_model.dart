@@ -3,12 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReviewModel {
   final String reviewerName;
+  final String reviewerId;
   final DateTime reviewDate;
   final int reviewRating;
   final String reviewText;
 
   ReviewModel({
     required this.reviewerName,
+    this.reviewerId = "",
     required this.reviewDate,
     required this.reviewRating,
     required this.reviewText,
@@ -17,6 +19,7 @@ class ReviewModel {
   factory ReviewModel.fromJson(Map<String, dynamic> data) {
     return ReviewModel(
       reviewerName: data["reviewerName"] ?? "",
+      reviewerId: data["reviewerId"] ?? "",
       reviewDate: data["reviewDate"] != null
           ? (data["reviewDate"] as Timestamp).toDate()
           : DateTime.now(),
@@ -24,6 +27,14 @@ class ReviewModel {
       reviewText: data["reviewText"] ?? "",
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    "reviewerName": reviewerName,
+    "reviewerId": reviewerId,
+    "reviewDate": Timestamp.fromDate(reviewDate),
+    "reviewRating": reviewRating,
+    "reviewText": reviewText,
+  };
 
   // method for dynamic date formatting
   String get dynamicDate {
@@ -39,7 +50,6 @@ class ReviewModel {
     } else if (difference.inDays < 7) {
       return "${difference.inDays} day${difference.inDays > 1 ? "s" : ""} ago";
     } else {
-      // if the date is more than 7 days old
       return DateFormat("yyyy-MM-dd").format(reviewDate);
     }
   }

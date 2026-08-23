@@ -19,6 +19,7 @@ class TrainingModel {
   final bool isPremium;
   final double trainingFee;
   final double trainingRating;
+  final int trainingRatingCount;
   final List<ReviewModel> trainingReviews;
 
   TrainingModel({
@@ -37,10 +38,10 @@ class TrainingModel {
     required this.isPremium,
     required this.trainingFee,
     required this.trainingRating,
+    this.trainingRatingCount = 0,
     required this.trainingReviews,
   });
 
-  // method to convert the firebase document in to a dart object
   factory TrainingModel.fromJson(
     Map<String, dynamic> data,
     String id,
@@ -65,6 +66,7 @@ class TrainingModel {
       isPremium: data["trainingIsPremium"] ?? false,
       trainingFee: data["trainingFee"]?.toDouble() ?? 0.0,
       trainingRating: data["trainingRating"]?.toDouble() ?? 0.0,
+      trainingRatingCount: (data["trainingRatingCount"] as num?)?.toInt() ?? 0,
       trainingReviews: reviews,
     );
   }

@@ -1,11 +1,23 @@
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:traintrack/constant/colors.dart';
+import 'package:traintrack/models/user_model.dart';
+import 'package:traintrack/models/review_model.dart';
+import 'package:traintrack/services/training_service.dart';
 import 'package:traintrack/widgets/custom_button.dart';
 
 class RatingPage extends StatefulWidget {
-  const RatingPage({super.key});
+  final String trainingId;
+  final String trainingName;
+
+  const RatingPage({
+    super.key,
+    required this.trainingId,
+    required this.trainingName,
+  });
 
   @override
   State<RatingPage> createState() => _RatingPageState();
@@ -15,14 +27,90 @@ class _RatingPageState extends State<RatingPage> {
   int _selectedRating = 0;
   final int _maxFeedbackLength = 200;
   final TextEditingController _feedbackController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitReview() async {
+    if (_selectedRating == 0 || _isSubmitting) return;
+
+    final user = context.read<UserModel?>();
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final reviewerId = user?.uid.isNotEmpty == true
+        ? user!.uid
+        : firebaseUser?.uid ?? "";
+
+    if (reviewerId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please sign in to leave a review.")),
+      );
+      return;
+    }
+
+    final reviewerName = user?.username.trim().isNotEmpty == true
+        ? user!.username
+        : (firebaseUser?.displayName?.trim().isNotEmpty == true
+              ? firebaseUser!.displayName!
+              : (firebaseUser?.email?.split('@').first ?? "User"));
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await TrainingService().addReview(
+        widget.trainingId,
+        ReviewModel(
+          reviewerName: reviewerName,
+          reviewerId: reviewerId,
+          reviewDate: DateTime.now(),
+          reviewRating: _selectedRating,
+          reviewText: _feedbackController.text.trim(),
+        ),
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: kSubMainColor,
+          showCloseIcon: true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          content: Text(
+            "Thank you for your feedback! 🥰",
+            style: TextStyle(color: kWhiteColor),
+          ),
+        ),
+      );
+
+      Future.delayed(const Duration(seconds: 2), () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) Navigator.pop(context);
+        });
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Couldn't submit your review: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Rate Your Experience",
-          style: TextStyle(fontSize: 18),
+        title: Text(
+          "Rate ${widget.trainingName}",
+          style: const TextStyle(fontSize: 18),
         ),
       ),
       body: SingleChildScrollView(
@@ -54,11 +142,13 @@ class _RatingPageState extends State<RatingPage> {
                 children: List.generate(
                   5,
                   (index) => IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedRating = index + 1;
-                      });
-                    },
+                    onPressed: _isSubmitting
+                        ? null
+                        : () {
+                            setState(() {
+                              _selectedRating = index + 1;
+                            });
+                          },
                     icon: Icon(
                       Icons.star,
                       color: index < _selectedRating
@@ -80,6 +170,7 @@ class _RatingPageState extends State<RatingPage> {
                   controller: _feedbackController,
                   maxLines: 5,
                   maxLength: _maxFeedbackLength,
+                  enabled: !_isSubmitting,
                   decoration: InputDecoration(
                     hintText: "Write your feedback...",
                     hintStyle: const TextStyle(color: kGreyColor),
@@ -102,38 +193,14 @@ class _RatingPageState extends State<RatingPage> {
                   },
                 ),
                 const SizedBox(height: 30),
-                CustomButton(
-                  buttonText: "Submit Feedback",
-                  buttonColor1: kSubMainColor,
-                  buttonColor2: kMainColor,
-                  onPressed: () {
-                    //dfinal feedback = _feedbackController.text.trim();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        backgroundColor: kSubMainColor,
-                        showCloseIcon: true,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
-                          ),
-                        ),
-                        content: Text(
-                          "Thank you for your feedback! 🥰",
-                          style: TextStyle(color: kWhiteColor),
-                        ),
+                _isSubmitting
+                    ? const CircularProgressIndicator(color: kSubMainColor)
+                    : CustomButton(
+                        buttonText: "Submit Feedback",
+                        buttonColor1: kSubMainColor,
+                        buttonColor2: kMainColor,
+                        onPressed: _submitReview,
                       ),
-                    );
-                    // close page after 2 seconds
-                    Future.delayed(const Duration(seconds: 2), () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          Navigator.pop(context);
-                        }
-                      });
-                    });
-                  },
-                ),
               ],
             ],
           ),
