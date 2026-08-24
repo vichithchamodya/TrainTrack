@@ -140,7 +140,7 @@ class BitzyState extends State<Bitzy> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                  top: 40,
+                  top: 80,
                   bottom: 10,
                   right: 20,
                   left: 20,
@@ -168,9 +168,9 @@ class BitzyState extends State<Bitzy> {
                 ),
               ),
 
-              // Close button
+              // close button
               Positioned(
-                top: 25,
+                top: 40,
                 right: 10,
                 child: IconButton(
                   icon: const Icon(Icons.close, size: 30, color: kWhiteColor),
@@ -243,51 +243,54 @@ class BitzyState extends State<Bitzy> {
           ),
         ),
 
-        // Input field
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          decoration: BoxDecoration(
-            color: Theme.of(context).appBarTheme.backgroundColor,
-            boxShadow: const [
-              BoxShadow(
-                color: kShadowColor,
-                blurRadius: 8,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: _sendMessage,
-                  decoration: InputDecoration(
-                    hintText: "Message Bitzy...",
-                    hintStyle: const TextStyle(color: kGreyColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
+        // input field
+        SafeArea(
+          top: false,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            decoration: BoxDecoration(
+              color: Theme.of(context).appBarTheme.backgroundColor,
+              boxShadow: const [
+                BoxShadow(
+                  color: kShadowColor,
+                  blurRadius: 8,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: _sendMessage,
+                    decoration: InputDecoration(
+                      hintText: "Message Bitzy...",
+                      hintStyle: const TextStyle(color: kGreyColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: kSubMainColor,
-                child: IconButton(
-                  icon: const Icon(Icons.send, color: Colors.white),
-                  onPressed: () => _sendMessage(_controller.text),
+                const SizedBox(width: 10),
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: kSubMainColor,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: () => _sendMessage(_controller.text),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

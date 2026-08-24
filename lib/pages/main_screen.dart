@@ -253,15 +253,12 @@ class MySearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> suggestions = [
-      "Python",
-      "Dart",
-      "Flutter",
-      "Java",
-      "Kotlin",
-      "Swift",
-      "React Native",
-      "React JS",
-      "Node JS",
+      "Leadership",
+      "Health",
+      "Diversity",
+      "Inclusion",
+      "Project Management",
+      "Professional Development",
     ];
     suggestions = suggestions
         .where((element) => element.toLowerCase().contains(query.toLowerCase()))

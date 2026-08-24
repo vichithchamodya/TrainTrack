@@ -53,6 +53,7 @@ class UserModel {
   final String email;
   final String photoUrl;
   final List<String> watchlist;
+  final List<String> purchasedTrainings;
   final Map<String, TrainingProgress> trainingProgress;
   final int studyGoalMinutes;
 
@@ -62,6 +63,7 @@ class UserModel {
     this.email = "",
     this.photoUrl = "",
     this.watchlist = const [],
+    this.purchasedTrainings = const [],
     this.trainingProgress = const {},
     this.studyGoalMinutes = 15,
   });
@@ -74,6 +76,9 @@ class UserModel {
       email: data["email"] as String? ?? "",
       photoUrl: data["photoUrl"] as String? ?? "",
       watchlist: List<String>.from(data["watchlist"] as List? ?? const []),
+      purchasedTrainings: List<String>.from(
+        data["purchasedTrainings"] as List? ?? const [],
+      ),
       trainingProgress: rawProgress.map(
         (id, value) => MapEntry(
           id,

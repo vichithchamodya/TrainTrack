@@ -83,7 +83,7 @@ class UserService {
 
   Future<void> saveProgress(String uid, TrainingProgress progress) {
     return _userDocument(uid).set({
-      "trainingProgress.${progress.trainingId}": progress.toMap(),
+      "trainingProgress": {progress.trainingId: progress.toMap()},
     }, SetOptions(merge: true));
   }
 
@@ -131,5 +131,11 @@ class UserService {
       // no existing picture - nothing to delete
     }
     await _userDocument(uid).set({"photoUrl": ""}, SetOptions(merge: true));
+  }
+
+  Future<void> markTrainingPurchased(String uid, String trainingId) {
+    return _userDocument(uid).set({
+      "purchasedTrainings": FieldValue.arrayUnion([trainingId]),
+    }, SetOptions(merge: true));
   }
 }

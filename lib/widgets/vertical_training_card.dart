@@ -106,17 +106,21 @@ class VerticalTrainingCard extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                trainingName,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: isPremium ? kWhiteColor : kBlackColor,
+                              Expanded(
+                                child: Text(
+                                  trainingName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: isPremium
+                                        ? kWhiteColor
+                                        : kBlackColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                              const Spacer(),
+                              const SizedBox(width: 5),
                               const Icon(
                                 Icons.star,
                                 size: 15,

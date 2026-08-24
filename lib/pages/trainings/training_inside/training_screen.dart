@@ -134,102 +134,106 @@ class _TrainingScreenState extends State<TrainingScreen> {
             // get the current lesson based on the page
             final currentLesson = lessons[_currentPage];
 
-            return Column(
-              children: [
-                Expanded(
-                  child: CustomVideoPlayer(videoUrl: currentLesson.moduleVideo),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    currentLesson.moduleName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            return SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: CustomVideoPlayer(
+                      videoUrl: currentLesson.moduleVideo,
                     ),
                   ),
-                ),
-                // pagination controls
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 20,
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      currentLesson.moduleName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _currentPage > 0
-                          ? Expanded(
-                              child: CustomButton(
-                                buttonText: "Previous",
-                                buttonColor1: kGreyColor,
-                                buttonColor2: kGreyColor,
-                                onPressed: _currentPage > 0
-                                    ? () {
-                                        setState(() {
-                                          _currentPage--;
-                                        });
-                                        _saveProgress(
-                                          totalSteps: totalLessons,
-                                          completed: false,
-                                        );
-                                      }
-                                    : null,
-                              ),
-                            )
-                          : const SizedBox(),
-                      Expanded(
-                        child: Text(
-                          'Lesson ${_currentPage + 1} of $totalLessons',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: kGreyColor,
+                  // pagination controls
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 20,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _currentPage > 0
+                            ? Expanded(
+                                child: CustomButton(
+                                  buttonText: "Previous",
+                                  buttonColor1: kGreyColor,
+                                  buttonColor2: kGreyColor,
+                                  onPressed: _currentPage > 0
+                                      ? () {
+                                          setState(() {
+                                            _currentPage--;
+                                          });
+                                          _saveProgress(
+                                            totalSteps: totalLessons,
+                                            completed: false,
+                                          );
+                                        }
+                                      : null,
+                                ),
+                              )
+                            : const SizedBox(),
+                        Expanded(
+                          child: Text(
+                            'Lesson ${_currentPage + 1} of $totalLessons',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: kGreyColor,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: CustomButton(
-                          buttonText: _currentPage < totalLessons - 1
-                              ? "Next"
-                              : "Finish",
-                          buttonColor1: _currentPage < totalLessons - 1
-                              ? kMainColor
-                              : Colors.green,
-                          buttonColor2: _currentPage < totalLessons - 1
-                              ? kSubMainColor
-                              : kGreenColor,
-                          onPressed: _currentPage < totalLessons - 1
-                              ? () {
-                                  setState(() {
-                                    _currentPage++;
-                                  });
-                                  _saveProgress(
-                                    totalSteps: totalLessons,
-                                    completed: false,
-                                  );
-                                }
-                              : () {
-                                  _saveProgress(
-                                    totalSteps: totalLessons,
-                                    completed: true,
-                                  );
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CompleteScreen(
-                                        trainingId: training.trainingId,
-                                        trainingName: training.trainingName,
+                        Expanded(
+                          child: CustomButton(
+                            buttonText: _currentPage < totalLessons - 1
+                                ? "Next"
+                                : "Finish",
+                            buttonColor1: _currentPage < totalLessons - 1
+                                ? kMainColor
+                                : Colors.green,
+                            buttonColor2: _currentPage < totalLessons - 1
+                                ? kSubMainColor
+                                : kGreenColor,
+                            onPressed: _currentPage < totalLessons - 1
+                                ? () {
+                                    setState(() {
+                                      _currentPage++;
+                                    });
+                                    _saveProgress(
+                                      totalSteps: totalLessons,
+                                      completed: false,
+                                    );
+                                  }
+                                : () {
+                                    _saveProgress(
+                                      totalSteps: totalLessons,
+                                      completed: true,
+                                    );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CompleteScreen(
+                                          trainingId: training.trainingId,
+                                          trainingName: training.trainingName,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }
         },
