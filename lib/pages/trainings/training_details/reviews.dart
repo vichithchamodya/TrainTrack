@@ -89,7 +89,7 @@ class Reviews extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Student Reviews",
+                  "Employee Reviews",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 TextButton.icon(
