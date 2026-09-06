@@ -27,8 +27,13 @@ class UserService {
           "email": email ?? "",
           "photoUrl": "",
           "watchlist": <String>[],
+          "purchasedTrainings": <String>[],
           "trainingProgress": <String, dynamic>{},
           "studyGoalMinutes": 15,
+          "createdAt": FieldValue.serverTimestamp(),
+          "isBanned": false,
+          "bannedReason": "",
+          "timeoutUntil": null,
         });
         return UserModel(
           uid: uid,
@@ -136,6 +141,28 @@ class UserService {
   Future<void> markTrainingPurchased(String uid, String trainingId) {
     return _userDocument(uid).set({
       "purchasedTrainings": FieldValue.arrayUnion([trainingId]),
+    }, SetOptions(merge: true));
+  }
+
+  Future<List<UserModel>> fetchUsers() async {
+    final snapshot = await _firestore.collection("users").get();
+    return snapshot.docs
+        .map((document) => UserModel.fromMap(document.id, document.data()))
+        .toList();
+  }
+
+  Future<void> setBan(String uid, {required bool banned, String reason = ""}) {
+    return _userDocument(uid).set({
+      "isBanned": banned,
+      "bannedReason": banned ? reason.trim() : "",
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> setTimeout(String uid, DateTime? timeoutUntil) {
+    return _userDocument(uid).set({
+      "timeoutUntil": timeoutUntil == null
+          ? null
+          : Timestamp.fromDate(timeoutUntil),
     }, SetOptions(merge: true));
   }
 }

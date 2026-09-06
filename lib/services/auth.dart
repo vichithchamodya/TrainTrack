@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:traintrack/models/user_model.dart';
@@ -25,27 +27,48 @@ class AuthServices {
   }
 
   // create the stream for checking the auth changes in the user
-  Stream<UserModel?> get user async* {
-    await for (final firebaseUser in _auth.authStateChanges()) {
-      if (firebaseUser == null) {
-        yield null;
-        continue;
+  Stream<UserModel?> get user {
+    return Stream<UserModel?>.multi((controller) {
+      StreamSubscription<User?>? authSubscription;
+      StreamSubscription<UserModel>? profileSubscription;
+      var transition = Future<void>.value();
+
+      Future<void> updateForAuthState(User? firebaseUser) async {
+        await profileSubscription?.cancel();
+        profileSubscription = null;
+
+        if (firebaseUser == null) {
+          controller.add(null);
+          return;
+        }
+
+        final authUser = _userWithFirebaseUserUid(firebaseUser)!;
+        profileSubscription = _userService
+            .watchUser(
+              firebaseUser.uid,
+              fallbackName: authUser.username,
+              email: authUser.email,
+            )
+            .listen(
+              controller.add,
+              onError: (Object error, StackTrace stackTrace) {
+                debugPrint(
+                  "watchUser failed for ${firebaseUser.uid}: $error\n$stackTrace",
+                );
+                controller.add(authUser);
+              },
+            );
       }
 
-      final authUser = _userWithFirebaseUserUid(firebaseUser)!;
-      try {
-        await for (final profile in _userService.watchUser(
-          firebaseUser.uid,
-          fallbackName: authUser.username,
-          email: authUser.email,
-        )) {
-          yield profile;
-        }
-      } catch (e, st) {
-        debugPrint("watchUser failed for ${firebaseUser.uid}: $e\n$st");
-        yield authUser;
-      }
-    }
+      authSubscription = _auth.authStateChanges().listen((firebaseUser) {
+        transition = transition.then((_) => updateForAuthState(firebaseUser));
+      });
+
+      controller.onCancel = () async {
+        await authSubscription?.cancel();
+        await profileSubscription?.cancel();
+      };
+    });
   }
 
   // signin anonymous

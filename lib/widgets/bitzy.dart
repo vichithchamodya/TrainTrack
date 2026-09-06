@@ -13,88 +13,88 @@ class BitzyState extends State<Bitzy> {
   final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _controller = TextEditingController();
 
-  // Custom logic for generating bot responses
   String _getBotResponse(String userInput) {
-    List<String> greetings = [
+    final message = userInput.toLowerCase().trim();
+
+    bool containsAny(List<String> terms) {
+      return terms.any(message.contains);
+    }
+
+    if (containsAny([
       "hello",
-      "hell",
       "hi",
       "hey",
       "hola",
-      "morning",
-      "evening",
-    ];
-    for (var greeting in greetings) {
-      if (userInput.toLowerCase().contains(greeting)) {
-        return "Hello! How can I assist you today?";
-      }
-    }
-
-    List<String> greet = [
-      "How do I enroll in a training?",
-      "I want to join a new training.",
-      "How do i get started ?",
-      "Can you guide me on training registration?",
-    ];
-    for (var greet in greet) {
-      if (userInput.toLowerCase().contains(greet)) {
-        return "To enroll in a training, go to the 'Trainings' section in the app, select your desired training, and follow the payment instructions. Let me know if you need more help!";
-      }
-    }
-
-    List<String> payments = [
-      "Do you support online payments?",
-      "What payment methods are available?",
-      "How can I pay for a training?",
-    ];
-    for (var payments in payments) {
-      if (userInput.toLowerCase().contains(payments)) {
-        return "Traintrack supports online payments via credit/debit cards and mobile wallets. You can pay securely through the app when enrolling in a training.";
-      }
-    }
-
-    List<String> modules = [
-      "Where can I find training modules?",
-      "How do I access the course materials?",
-      "Can you show me the available modules?",
-    ];
-    for (var modules in modules) {
-      if (userInput.toLowerCase().contains(modules)) {
-        return "You can access training modules in the 'Resources' section of the app. Just select your subject, and you'll find all the available modules.";
-      }
-    }
-
-    List<String> goals = [
-      "I want to improve my study habits.",
-      "Can you suggest a study plan for me?",
-      "How does the study goal feature work?",
-    ];
-    for (var goals in goals) {
-      if (userInput.toLowerCase().contains(goals)) {
-        return "Traintrack analyzes your learning patterns and study time to create personalized study goals. You can check your study progress in the 'Study Goals' section.";
-      }
-    }
-
-    List<String> trainingCategories = [
-      "What trainings are available?",
-      "Do you have Technical trainings?",
-      "Can I learn Leadership Management here?",
-    ];
-    for (var category in trainingCategories) {
-      if (userInput.toLowerCase().contains(category.toLowerCase())) {
-        return "Yes! Traintrack offers various trainings in Onboarding & Orientation, Leadership & Management, Compliance & Legal, Workplace Safety & Health and more. Check them in the 'Explore' section.";
-      }
-    }
-
-    if (userInput.toLowerCase().contains("ddd")) {
+      "good morning",
+      "good afternoon",
+      "good evening",
+    ])) {
       return "Hello! How can I assist you today?";
-    } else if (userInput.toLowerCase().contains("price")) {
-      return "The prices vary based on the item. Could you specify which item you're asking about?";
-    } else if (userInput.toLowerCase().contains("training")) {
-      return "I can help you find available trainings. Which subject are you interested in?";
-    } else {
-      return "Sorry, I didn't quite get that. Could you please rephrase?";
     }
+
+    if (containsAny(["enroll", "enrol", "join", "register", "sign up"]) &&
+        containsAny(["training", "course", "program"])) {
+      return "To enroll in a training, open the Explore section, choose a training, and follow the enrollment or payment steps.";
+    }
+
+    if (containsAny(["pay", "payment", "price", "cost", "fee", "premium"])) {
+      return "Premium training prices are shown on each training page. You can pay securely through the available payment options when enrolling.";
+    }
+
+    if (containsAny([
+      "module",
+      "lesson",
+      "course material",
+      "resources",
+      "video",
+    ])) {
+      return "Open a training from Explore to access its lessons and course materials. Your progress is saved as you move through each lesson.";
+    }
+
+    if (containsAny([
+      "study goal",
+      "study plan",
+      "study habit",
+      "goal",
+      "routine",
+    ])) {
+      return "You can manage your daily study goal from your profile and track your learning progress as you complete trainings.";
+    }
+
+    if (containsAny([
+          "available",
+          "catalog",
+          "what can i learn",
+          "subjects",
+          "categories",
+        ]) &&
+        containsAny(["training", "course", "learn", "available", "subjects"])) {
+      return "TrainTrack offers onboarding, leadership, compliance, workplace safety, health, and other professional development trainings. Browse them in Explore.";
+    }
+
+    if (containsAny(["certificate", "certification", "completion proof"])) {
+      return "After you complete a training, open the certificate option on the completion screen to preview and download your PDF certificate.";
+    }
+
+    if (containsAny([
+      "progress",
+      "completed",
+      "finish",
+      "ongoing",
+      "my training",
+    ])) {
+      return "You can view ongoing and completed trainings from My Trainings. Your completed lessons and study time are saved to your profile.";
+    }
+
+    if (containsAny(["thank", "thanks"])) {
+      return "You're welcome! I'm here whenever you need help with TrainTrack.";
+    }
+
+    if (containsAny(["bye", "goodbye", "see you"])) {
+      return "Goodbye! Keep making progress with your learning.";
+    }
+
+    return "I can help with trainings, enrollment, payments, lessons, study goals, progress, and certificates. What would you like to know?";
   }
 
   void _sendMessage(String text) {
@@ -106,14 +106,21 @@ class BitzyState extends State<Bitzy> {
 
       // Simulate bot response with delay
       Future.delayed(const Duration(milliseconds: 500), () {
+        if (!mounted) return;
         setState(() {
-          String botResponse = _getBotResponse(text); // Get custom bot response
+          final botResponse = _getBotResponse(text);
           _messages.add({"text": botResponse, "isUser": false});
         });
       });
     });
 
     _controller.clear();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override

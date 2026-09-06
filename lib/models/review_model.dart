@@ -7,6 +7,7 @@ class ReviewModel {
   final DateTime reviewDate;
   final int reviewRating;
   final String reviewText;
+  final String photoUrl;
 
   ReviewModel({
     required this.reviewerName,
@@ -14,6 +15,7 @@ class ReviewModel {
     required this.reviewDate,
     required this.reviewRating,
     required this.reviewText,
+    this.photoUrl = "",
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> data) {
@@ -25,6 +27,7 @@ class ReviewModel {
           : DateTime.now(),
       reviewRating: data["reviewRating"]?.toInt() ?? 0,
       reviewText: data["reviewText"] ?? "",
+      photoUrl: data["photoUrl"] ?? "",
     );
   }
 
@@ -34,6 +37,7 @@ class ReviewModel {
     "reviewDate": Timestamp.fromDate(reviewDate),
     "reviewRating": reviewRating,
     "reviewText": reviewText,
+    "photoUrl": photoUrl,
   };
 
   // method for dynamic date formatting

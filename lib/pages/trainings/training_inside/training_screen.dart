@@ -223,6 +223,9 @@ class _TrainingScreenState extends State<TrainingScreen> {
                                         builder: (context) => CompleteScreen(
                                           trainingId: training.trainingId,
                                           trainingName: training.trainingName,
+                                          certificateTemplate:
+                                              training.certificateTemplate,
+                                          completedAt: DateTime.now(),
                                         ),
                                       ),
                                     );

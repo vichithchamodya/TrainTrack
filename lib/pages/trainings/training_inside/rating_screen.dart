@@ -68,6 +68,7 @@ class _RatingPageState extends State<RatingPage> {
           reviewDate: DateTime.now(),
           reviewRating: _selectedRating,
           reviewText: _feedbackController.text.trim(),
+          photoUrl: user?.photoUrl ?? "",
         ),
       );
 

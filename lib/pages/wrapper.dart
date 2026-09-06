@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:traintrack/models/user_model.dart';
-import 'package:traintrack/pages/authentication/authenticate.dart';
 import 'package:traintrack/pages/main_screen.dart';
 import 'package:traintrack/widgets/side_menu.dart';
+import 'package:traintrack/pages/authentication/authenticate.dart';
+import 'package:traintrack/pages/authentication/account_restricted_screen.dart';
 
 class Wrapper extends StatelessWidget {
   const Wrapper({super.key});
@@ -16,6 +17,10 @@ class Wrapper extends StatelessWidget {
 
     if (user == null || user.uid.isEmpty) {
       return const Authenticate();
+    } else if (user.isBanned ||
+        (user.timeoutUntil != null &&
+            user.timeoutUntil!.isAfter(DateTime.now()))) {
+      return AccountRestrictedScreen(user: user);
     } else {
       return Stack(children: [SideMenu(), const MainScreen()]);
     }

@@ -56,6 +56,10 @@ class UserModel {
   final List<String> purchasedTrainings;
   final Map<String, TrainingProgress> trainingProgress;
   final int studyGoalMinutes;
+  final DateTime? createdAt;
+  final bool isBanned;
+  final String bannedReason;
+  final DateTime? timeoutUntil;
 
   const UserModel({
     required this.uid,
@@ -66,7 +70,18 @@ class UserModel {
     this.purchasedTrainings = const [],
     this.trainingProgress = const {},
     this.studyGoalMinutes = 15,
+    this.createdAt,
+    this.isBanned = false,
+    this.bannedReason = "",
+    this.timeoutUntil,
   });
+
+  static DateTime? _dateTimeFromValue(Object? value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
 
   factory UserModel.fromMap(String uid, Map<String, dynamic> data) {
     final rawProgress = data["trainingProgress"] as Map<String, dynamic>? ?? {};
@@ -86,6 +101,10 @@ class UserModel {
         ),
       ),
       studyGoalMinutes: (data["studyGoalMinutes"] as num?)?.toInt() ?? 15,
+      createdAt: _dateTimeFromValue(data["createdAt"]),
+      isBanned: data["isBanned"] as bool? ?? false,
+      bannedReason: data["bannedReason"] as String? ?? "",
+      timeoutUntil: _dateTimeFromValue(data["timeoutUntil"]),
     );
   }
 }

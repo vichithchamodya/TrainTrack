@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:traintrack/models/module_model.dart';
 import 'package:traintrack/models/review_model.dart';
+import 'package:traintrack/models/certificate_template.dart';
 
 class TrainingModel {
   final String trainingId;
@@ -21,6 +22,7 @@ class TrainingModel {
   final double trainingRating;
   final int trainingRatingCount;
   final List<ReviewModel> trainingReviews;
+  final CertificateTemplate? certificateTemplate;
 
   TrainingModel({
     required this.trainingId,
@@ -40,6 +42,7 @@ class TrainingModel {
     required this.trainingRating,
     this.trainingRatingCount = 0,
     required this.trainingReviews,
+    this.certificateTemplate,
   });
 
   factory TrainingModel.fromJson(
@@ -68,6 +71,11 @@ class TrainingModel {
       trainingRating: data["trainingRating"]?.toDouble() ?? 0.0,
       trainingRatingCount: (data["trainingRatingCount"] as num?)?.toInt() ?? 0,
       trainingReviews: reviews,
+      certificateTemplate: data["certificateTemplate"] is Map
+          ? CertificateTemplate.fromMap(
+              Map<String, dynamic>.from(data["certificateTemplate"] as Map),
+            )
+          : null,
     );
   }
 }
